@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import {
   Laptop, Wrench, Tv, Smartphone, Gamepad2, WashingMachine,
   Camera, Music, ShieldCheck, Clock, TrendingUp, Lock,
@@ -9,6 +9,7 @@ import {
 } from "lucide-react"
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
+
 const NAV_LINKS = [
   { label: "Servicios",      href: "#servicios" },
   { label: "Cómo funciona",  href: "#proceso" },
@@ -45,12 +46,12 @@ const STATS = [
 const TESTIMONIOS = [
   { inicial: "M", nombre: "Miguel A.", ciudad: "Cochabamba", texto: "Necesitaba dinero urgente y en 20 minutos tenía el préstamo en mano. Trato excelente y sin complicaciones.", estrellas: 5 },
   { inicial: "S", nombre: "Sandra R.", ciudad: "Quillacollo", texto: "Vendí mi laptop vieja y me dieron un precio muy justo. Todo con claridad, sin presiones. Volvería sin dudar.", estrellas: 5 },
-  { inicial: "J", nombre: "Jorge P.", ciudad: "Sacaba",      texto: "Llevo dos años usando sus servicios cuando necesito liquidez rápida. Siempre transparencia y buen trato.", estrellas: 5 },
+  { inicial: "J", nombre: "Jorge P.", ciudad: "Sacaba",       texto: "Llevo dos años usando sus servicios cuando necesito liquidez rápida. Siempre transparencia y buen trato.", estrellas: 5 },
   { inicial: "C", nombre: "Carmen V.", ciudad: "Cochabamba", texto: "Fui con mis herramientas de trabajo y la oferta fue justa y rápida. El personal muy amable.", estrellas: 5 },
 ]
 
 const FAQS = [
-  { p: "¿Qué artículos puedo empeñar?",                    r: "Aceptamos electrónica, herramientas, electrodomésticos, instrumentos musicales, cámaras y más. Si tienes dudas sobre un artículo puntual, consúltanos y te orientamos." },
+  { p: "¿Qué artículos puedo empeñar?",                     r: "Aceptamos electrónica, herramientas, electrodomésticos, instrumentos musicales, cámaras y más. Si tienes dudas sobre un artículo puntual, consúltanos y te orientamos." },
   { p: "¿Cuánto tiempo tengo para recuperar mi artículo?",  r: "El plazo estándar es 30 días, renovable pagando solo los intereses. Trabajamos con flexibilidad para adaptarnos a tu situación." },
   { p: "¿Cómo se calcula el monto del préstamo?",           r: "Basamos el monto en el valor de mercado actual del artículo y su estado de conservación. Nuestros tasadores garantizan la mejor valoración posible." },
   { p: "¿Mis datos son confidenciales?",                    r: "Absolutamente. Toda la información que nos proporcionas se maneja con total discreción y confidencialidad." },
@@ -60,7 +61,7 @@ const FAQS = [
 
 const CONTACTO = {
   telefono:  "+591 4 456-7890",
-  whatsapp:  "59175140189",
+  whatsapp:  "59170123456",
   email:     "info@empenosgc.bo",
   direccion: "Av. Heroínas #890, entre Jordán y 25 de Mayo",
   ciudad:    "Cochabamba, Bolivia",
@@ -72,15 +73,18 @@ const CONTACTO = {
 }
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
-const scrollTo = (href: string) => {
+
+function scrollTo(href: string) {
   document.querySelector(href)?.scrollIntoView({ behavior: "smooth" })
 }
 
-// ─── COMPONENTS ──────────────────────────────────────────────────────────────
+// ─── PAGE ─────────────────────────────────────────────────────────────────────
 
-const Navbar = () => {
-  const [scrolled, setScrolled] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
+export default function Page() {
+  const [menuOpen,   setMenuOpen]   = useState(false)
+  const [scrolled,   setScrolled]   = useState(false)
+  const [faqOpen,    setFaqOpen]    = useState<number | null>(0)
+  const heroRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40)
@@ -90,264 +94,569 @@ const Navbar = () => {
 
   return (
     <>
-      <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled ? "bg-slate-950/95 backdrop-blur-md shadow-sm border-b border-white/10" : "bg-transparent"}`}>
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <a href="#" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-amber-500 rounded-md flex items-center justify-center font-bold text-white text-sm group-hover:bg-amber-400 transition-colors">GC</div>
-            <span className="font-bold text-white text-lg tracking-wide">Empeños GC</span>
+      {/* ── GLOBAL STYLES (Tailwind v4 @theme + Google Fonts) ─────────────── */}
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@400;500;600&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+
+        :root {
+          --navy:        #0d1b35;
+          --navy-mid:    #162850;
+          --amber:       #d97706;
+          --amber-hi:    #f59e0b;
+          --cream:       #f8f4ee;
+          --cream-dark:  #ede8de;
+          --slate:       #5a6a82;
+          --text:        #1a2338;
+
+          --font-display: 'Fraunces', Georgia, serif;
+          --font-body:    'DM Sans', system-ui, sans-serif;
+        }
+
+        body {
+          font-family: var(--font-body);
+          background: var(--cream);
+          color: var(--text);
+          line-height: 1.65;
+        }
+
+        h1,h2,h3,h4 {
+          font-family: var(--font-display);
+          line-height: 1.1;
+        }
+
+        :focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--cream); }
+        ::-webkit-scrollbar-thumb { background: var(--navy); border-radius: 99px; }
+
+        /* fade-up utility */
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(28px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .fade-up { animation: fadeUp .65s ease both; }
+        .delay-1 { animation-delay: .1s; }
+        .delay-2 { animation-delay: .2s; }
+        .delay-3 { animation-delay: .3s; }
+        .delay-4 { animation-delay: .45s; }
+        .delay-5 { animation-delay: .6s; }
+
+        /* pill badge */
+        .badge {
+          display: inline-flex; align-items: center; gap: 6px;
+          background: color-mix(in srgb, var(--amber) 15%, transparent);
+          border: 1px solid color-mix(in srgb, var(--amber) 35%, transparent);
+          color: var(--amber);
+          font-size: .7rem; font-weight: 600; letter-spacing: .2em;
+          text-transform: uppercase; padding: 5px 14px; border-radius: 99px;
+        }
+
+        /* grid dots bg */
+        .dot-bg {
+          background-image: radial-gradient(circle, color-mix(in srgb, var(--amber) 25%, transparent) 1px, transparent 1px);
+          background-size: 28px 28px;
+        }
+
+        /* service card hover */
+        .service-card { transition: box-shadow .2s, border-color .2s, transform .2s; }
+        .service-card:hover { box-shadow: 0 8px 32px color-mix(in srgb, var(--navy) 10%, transparent); transform: translateY(-2px); border-color: color-mix(in srgb, var(--amber) 50%, transparent) !important; }
+
+        /* nav link */
+        .nav-link { position:relative; color: rgba(255,255,255,.75); font-size:.875rem; padding: 4px 0; transition: color .2s; }
+        .nav-link::after { content:''; position:absolute; bottom:-2px; left:0; width:0; height:2px; background:var(--amber); transition:width .2s; border-radius:99px; }
+        .nav-link:hover { color:#fff; }
+        .nav-link:hover::after { width:100%; }
+
+        /* faq */
+        .faq-body { overflow: hidden; transition: max-height .35s ease, opacity .3s ease; }
+      `}</style>
+
+      {/* ── NAVBAR ──────────────────────────────────────────────────────────── */}
+      <header
+        style={{
+          position: "fixed", inset: "0 0 auto", zIndex: 50,
+          transition: "background .3s, box-shadow .3s",
+          background: scrolled ? "rgba(13,27,53,.96)" : "transparent",
+          backdropFilter: scrolled ? "blur(12px)" : "none",
+          boxShadow: scrolled ? "0 1px 0 rgba(255,255,255,.07)" : "none",
+        }}
+      >
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          {/* Logo */}
+          <a href="#" style={{ display: "flex", alignItems: "center", gap: 10 }} aria-label="Inicio">
+            <div style={{ width: 34, height: 34, background: "var(--amber)", borderRadius: 6, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"var(--font-display)", fontWeight:900, color:"#fff", fontSize:13, letterSpacing:1 }}>GC</div>
+            <span style={{ fontFamily:"var(--font-display)", fontWeight:700, color:"#fff", fontSize:18, letterSpacing:".5px" }}>Empeños GC</span>
           </a>
 
-          <nav className="hidden md:flex gap-6">
+          {/* Desktop nav */}
+          <nav style={{ display:"flex", gap:4 }} className="hidden-mobile" aria-label="Principal">
             {NAV_LINKS.map(l => (
-              <button key={l.href} onClick={() => scrollTo(l.href)} className="text-white/75 hover:text-amber-400 text-sm font-medium transition-colors">
-                {l.label}
-              </button>
+              <button key={l.href} onClick={() => scrollTo(l.href)} className="nav-link" style={{ background:"none", border:"none", cursor:"pointer", padding:"4px 14px" }}>{l.label}</button>
             ))}
           </nav>
 
-          <div className="flex items-center gap-4">
-            <a href={`https://wa.me/${CONTACTO.whatsapp}`} target="_blank" rel="noreferrer" className="hidden sm:flex items-center gap-2 bg-amber-600 hover:bg-amber-500 text-white font-semibold text-sm px-4 py-2 rounded-md transition-colors">
-              <MessageCircle size={16} /> WhatsApp
+          {/* CTA + burger */}
+          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+            <a href={`https://wa.me/${CONTACTO.whatsapp}`} target="_blank" rel="noreferrer"
+              style={{ display:"flex", alignItems:"center", gap:6, background:"var(--amber)", color:"#fff", fontWeight:600, fontSize:13, padding:"8px 18px", borderRadius:6, textDecoration:"none", transition:"background .2s" }}
+              onMouseEnter={e => (e.currentTarget.style.background = "var(--amber-hi)")}
+              onMouseLeave={e => (e.currentTarget.style.background = "var(--amber)")}
+            >
+              <MessageCircle size={14} /> WhatsApp
             </a>
-            <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden text-white p-1">
-              {menuOpen ? <X size={24} /> : <Menu size={24} />}
+            <button
+              onClick={() => setMenuOpen(v => !v)}
+              style={{ background:"none", border:"none", color:"#fff", cursor:"pointer", display:"none" }}
+              className="burger-btn"
+              aria-label="Menú"
+            >
+              {menuOpen ? <X size={22}/> : <Menu size={22}/>}
             </button>
           </div>
         </div>
       </header>
 
-      {/* Mobile Menu */}
-      <div className={`fixed inset-0 z-40 bg-slate-950 pt-20 px-6 flex flex-col transition-transform duration-300 md:hidden ${menuOpen ? "translate-x-0" : "translate-x-full"}`}>
+      {/* Mobile drawer */}
+      <div style={{
+        position:"fixed", inset:0, zIndex:40, background:"var(--navy)",
+        display:"flex", flexDirection:"column", paddingTop:80, paddingLeft:24, paddingRight:24,
+        transition:"transform .3s", transform: menuOpen ? "translateX(0)" : "translateX(100%)",
+      }}>
         {NAV_LINKS.map(l => (
-          <button key={l.href} onClick={() => { scrollTo(l.href); setMenuOpen(false) }} className="text-left text-white/80 font-bold text-xl py-4 border-b border-white/10">
-            {l.label}
-          </button>
+          <button key={l.href}
+            onClick={() => { scrollTo(l.href); setMenuOpen(false) }}
+            style={{ background:"none", border:"none", color:"rgba(255,255,255,.8)", textAlign:"left", fontSize:18, fontFamily:"var(--font-display)", fontWeight:700, padding:"14px 0", borderBottom:"1px solid rgba(255,255,255,.07)", cursor:"pointer" }}
+          >{l.label}</button>
         ))}
-        <a href={`https://wa.me/${CONTACTO.whatsapp}`} className="mt-6 flex items-center justify-center gap-2 bg-amber-600 text-white font-semibold py-3 rounded-lg">
-          <MessageCircle size={18} /> Escribir por WhatsApp
-        </a>
+        <a href={`https://wa.me/${CONTACTO.whatsapp}`} target="_blank" rel="noreferrer"
+          style={{ marginTop:24, display:"flex", alignItems:"center", justifyContent:"center", gap:8, background:"var(--amber)", color:"#fff", fontWeight:600, padding:"14px", borderRadius:8, textDecoration:"none", fontSize:15 }}
+        ><MessageCircle size={16}/> Escribir por WhatsApp</a>
       </div>
-    </>
-  )
-}
 
-const Hero = () => (
-  <section className="relative min-h-screen bg-slate-950 flex items-center overflow-hidden pt-20">
-    {/* Decoración de fondo */}
-    <div className="absolute inset-0 opacity-5 bg-[linear-gradient(white_1px,transparent_1px),linear-gradient(90deg,white_1px,transparent_1px)] bg-[size:64px_64px]" />
-    <div className="absolute -top-[10%] -right-[5%] w-[600px] h-[600px] rounded-full bg-amber-500/10 blur-[100px] pointer-events-none" />
-    <div className="absolute -bottom-[15%] -left-[5%] w-[400px] h-[400px] rounded-full bg-amber-500/10 blur-[80px] pointer-events-none" />
+      <main>
 
-    <div className="max-w-7xl mx-auto px-6 py-20 w-full relative z-10">
-      <div className="max-w-2xl">
-        <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 text-amber-500 text-xs font-bold tracking-widest uppercase px-4 py-1.5 rounded-full mb-8">
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-          Préstamos inmediatos · Cochabamba
-        </div>
+        {/* ── HERO ──────────────────────────────────────────────────────────── */}
+        <section ref={heroRef} style={{ position:"relative", minHeight:"100vh", background:"var(--navy)", display:"flex", alignItems:"center", overflow:"hidden" }}>
+          {/* grid lines */}
+          <div aria-hidden style={{ position:"absolute", inset:0, opacity:.045,
+            backgroundImage:"linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px)",
+            backgroundSize:"64px 64px" }}/>
+          {/* amber glow */}
+          <div aria-hidden style={{ position:"absolute", top:"-10%", right:"-5%", width:600, height:600, borderRadius:"50%", background:"color-mix(in srgb, var(--amber) 12%, transparent)", filter:"blur(100px)", pointerEvents:"none" }}/>
+          <div aria-hidden style={{ position:"absolute", bottom:"-15%", left:"-5%", width:400, height:400, borderRadius:"50%", background:"color-mix(in srgb, var(--amber) 6%, transparent)", filter:"blur(80px)", pointerEvents:"none" }}/>
 
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-white leading-tight tracking-tight mb-6">
-          Dinero inmediato <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-600">por tus artículos.</span>
-        </h1>
-
-        <p className="text-lg text-white/60 mb-10 max-w-xl leading-relaxed">
-          Empeña celulares, laptops, herramientas, electrodomésticos y más. Evaluación justa, proceso transparente y efectivo en 15 minutos.
-        </p>
-
-        <div className="flex flex-wrap gap-4 mb-14">
-          <button onClick={() => scrollTo("#proceso")} className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 px-6 rounded-lg transition-colors">
-            Cómo funciona <ArrowRight size={18} />
-          </button>
-          <a href={`https://wa.me/${CONTACTO.whatsapp}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 border-2 border-white/20 hover:border-white/60 text-white font-bold py-3 px-6 rounded-lg transition-colors">
-            <MessageCircle size={18} /> Consultar por WhatsApp
-          </a>
-        </div>
-
-        <div className="flex flex-wrap gap-6">
-          {[
-            { icon: ShieldCheck, label: "100% Confidencial" },
-            { icon: Clock, label: "Dinero en 15 min" },
-            { icon: Star, label: "+12.000 clientes" },
-          ].map(({ icon: Icon, label }) => (
-            <div key={label} className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                <Icon size={16} className="text-amber-500" />
+          <div style={{ maxWidth:1280, margin:"0 auto", padding:"160px 24px 120px", width:"100%", position:"relative", zIndex:1 }}>
+            <div style={{ maxWidth:700 }}>
+              <div className="badge fade-up" style={{ marginBottom:28 }}>
+                <span style={{ width:6, height:6, borderRadius:"50%", background:"var(--amber)", display:"inline-block" }}/>
+                Préstamos inmediatos · Cochabamba, Bolivia
               </div>
-              <span className="text-sm text-white/60">{label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-    
-    {/* SVG Divider Bottom */}
-    <div className="absolute bottom-0 left-0 right-0">
-      <svg viewBox="0 0 1440 72" className="w-full h-12 md:h-16 fill-slate-50" preserveAspectRatio="none">
-        <polygon points="0,72 1440,0 1440,72" />
-      </svg>
-    </div>
-  </section>
-)
 
-const Stats = () => (
-  <section className="bg-slate-950 py-12 px-6">
-    <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
-      {STATS.map(s => (
-        <div key={s.label} className="text-center">
-          <p className="font-black text-4xl md:text-5xl text-white mb-2">{s.valor}</p>
-          <p className="text-xs text-white/50 tracking-wider uppercase">{s.label}</p>
-        </div>
-      ))}
-    </div>
-  </section>
-)
+              <h1 className="fade-up delay-1" style={{ fontSize:"clamp(2.6rem,6vw,5rem)", fontWeight:900, color:"#fff", marginBottom:24, letterSpacing:"-.02em" }}>
+                Dinero inmediato<br/>
+                <span style={{ background:"linear-gradient(90deg, var(--amber-hi), var(--amber))", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
+                  por tus artículos.
+                </span>
+              </h1>
 
-const Servicios = () => (
-  <section id="servicios" className="py-24 px-6 bg-slate-50">
-    <div className="max-w-7xl mx-auto">
-      <div className="text-center mb-16">
-        <p className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-3">¿Qué puedes empeñar?</p>
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 mb-4">Artículos que aceptamos</h2>
-        <p className="text-lg text-slate-600 max-w-2xl mx-auto">Nos especializamos en electrónica, herramientas y equipos del hogar. No en joyas.</p>
-      </div>
+              <p className="fade-up delay-2" style={{ fontSize:"1.15rem", color:"rgba(255,255,255,.6)", maxWidth:520, marginBottom:40, lineHeight:1.75 }}>
+                Empeña celulares, laptops, herramientas, electrodomésticos y más.
+                Evaluación justa, proceso transparente y efectivo en 15 minutos.
+              </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {SERVICIOS.map(({ icon: Icon, label, desc }) => (
-          <article key={label} className="bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-xl hover:-translate-y-1 hover:border-amber-500/50 transition-all duration-300">
-            <div className="w-12 h-12 rounded-xl bg-slate-900/5 flex items-center justify-center mb-4">
-              <Icon size={24} className="text-slate-900" />
-            </div>
-            <h3 className="font-bold text-lg text-slate-900 mb-2">{label}</h3>
-            <p className="text-sm text-slate-600 leading-relaxed">{desc}</p>
-          </article>
-        ))}
-      </div>
+              <div className="fade-up delay-3" style={{ display:"flex", flexWrap:"wrap", gap:12, marginBottom:56 }}>
+                <button onClick={() => scrollTo("#proceso")}
+                  style={{ display:"flex", alignItems:"center", gap:8, background:"var(--amber)", color:"#fff", fontWeight:700, fontSize:15, padding:"14px 28px", borderRadius:8, border:"none", cursor:"pointer", transition:"background .2s" }}
+                  onMouseEnter={e => (e.currentTarget.style.background = "var(--amber-hi)")}
+                  onMouseLeave={e => (e.currentTarget.style.background = "var(--amber)")}
+                >
+                  Cómo funciona <ArrowRight size={16}/>
+                </button>
+                <a href={`https://wa.me/${CONTACTO.whatsapp}`} target="_blank" rel="noreferrer"
+                  style={{ display:"flex", alignItems:"center", gap:8, border:"2px solid rgba(255,255,255,.2)", color:"#fff", fontWeight:600, fontSize:15, padding:"14px 28px", borderRadius:8, textDecoration:"none", transition:"border-color .2s" }}
+                  onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(255,255,255,.6)")}
+                  onMouseLeave={e => (e.currentTarget.style.borderColor = "rgba(255,255,255,.2)")}
+                >
+                  <MessageCircle size={16}/> Consultar por WhatsApp
+                </a>
+              </div>
 
-      <p className="text-center mt-10 text-slate-600">
-        ¿No ves tu artículo? <button onClick={() => scrollTo("#contacto")} className="text-amber-600 font-bold hover:underline">Consúltanos →</button>
-      </p>
-    </div>
-  </section>
-)
-
-const Proceso = () => (
-  <section id="proceso" className="py-24 px-6 bg-slate-950 relative overflow-hidden">
-    <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(245,158,11,0.25)_1px,transparent_1px)] bg-[size:28px_28px] opacity-20" />
-    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-amber-500/10 blur-[100px] pointer-events-none" />
-
-    <div className="max-w-7xl mx-auto relative z-10">
-      <div className="text-center mb-16">
-        <p className="text-xs font-bold tracking-[0.2em] uppercase text-amber-500 mb-3">Proceso simple</p>
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4">Obtén tu dinero en 4 pasos</h2>
-        <p className="text-lg text-white/60 max-w-2xl mx-auto">Sin papeleo, sin esperas. Todo explicado con total claridad.</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {PASOS.map(paso => (
-          <div key={paso.n} className="bg-white/5 border border-white/10 rounded-2xl p-8 hover:border-amber-500/50 transition-colors">
-            <div className="font-black text-6xl text-amber-500/20 mb-4 select-none">{paso.n}</div>
-            <h3 className="font-bold text-xl text-white mb-3">{paso.titulo}</h3>
-            <p className="text-sm text-white/60 leading-relaxed">{paso.desc}</p>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-        {[
-          { icon: Lock, title: "Artículos asegurados", desc: "Cada artículo queda registrado y guardado bajo llave durante el plazo del préstamo." },
-          { icon: TrendingUp, title: "Precio de mercado", desc: "Tasamos según el valor real actual para garantizarte la mejor oferta posible." },
-        ].map(({ icon: Icon, title, desc }) => (
-          <div key={title} className="flex gap-4 bg-white/5 border border-white/10 rounded-xl p-5">
-            <div className="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center shrink-0">
-              <Icon size={24} className="text-amber-500" />
-            </div>
-            <div>
-              <p className="font-bold text-white mb-1">{title}</p>
-              <p className="text-xs text-white/50 leading-relaxed">{desc}</p>
+              {/* trust badges */}
+              <div className="fade-up delay-4" style={{ display:"flex", flexWrap:"wrap", gap:20 }}>
+                {[
+                  { icon: ShieldCheck, label: "100% Confidencial" },
+                  { icon: Clock,       label: "Dinero en 15 min" },
+                  { icon: Star,        label: "+12.000 clientes" },
+                ].map(({ icon: Icon, label }) => (
+                  <div key={label} style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    <div style={{ width:30, height:30, borderRadius:"50%", background:"rgba(255,255,255,.08)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                      <Icon size={14} color="var(--amber)"/>
+                    </div>
+                    <span style={{ fontSize:13, color:"rgba(255,255,255,.55)" }}>{label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        ))}
-      </div>
-    </div>
-  </section>
-)
 
-const FAQ = () => {
-  const [openIndex, setOpenIndex] = useState<number | null>(0)
+          {/* bottom svg divider */}
+          <div aria-hidden style={{ position:"absolute", bottom:0, left:0, right:0 }}>
+            <svg viewBox="0 0 1440 72" preserveAspectRatio="none" style={{ width:"100%", height:72, display:"block" }}>
+              <polygon points="0,72 1440,0 1440,72" fill="var(--cream)"/>
+            </svg>
+          </div>
+        </section>
 
-  return (
-    <section id="faq" className="py-24 px-6 bg-slate-50">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-        <div className="lg:col-span-4 lg:sticky lg:top-24">
-          <p className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-3">Preguntas frecuentes</p>
-          <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Todo lo que necesitas saber</h2>
-          <p className="text-slate-600 mb-8">Si no encuentras tu respuesta aquí, escríbenos directamente.</p>
-          <button onClick={() => scrollTo("#contacto")} className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-            Ir a contacto <ArrowRight size={18} />
-          </button>
-        </div>
+        {/* ── STATS BAND ────────────────────────────────────────────────────── */}
+        <section style={{ background:"var(--navy)", padding:"48px 24px" }}>
+          <div style={{ maxWidth:1280, margin:"0 auto", display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(160px,1fr))", gap:24 }}>
+            {STATS.map(s => (
+              <div key={s.label} style={{ textAlign:"center" }}>
+                <p style={{ fontFamily:"var(--font-display)", fontWeight:900, fontSize:"clamp(2rem,4vw,3rem)", color:"#fff", lineHeight:1 }}>
+                  {s.valor.replace(/\d+/, m => m)}<span style={{ color:"var(--amber)" }}></span>
+                </p>
+                <p style={{ fontSize:12, color:"rgba(255,255,255,.45)", marginTop:8, letterSpacing:".05em", textTransform:"uppercase" }}>{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
-        <div className="lg:col-span-8 bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-          {FAQS.map((faq, i) => (
-            <div key={i} className={`border-b border-slate-200 last:border-0`}>
-              <button 
-                onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                className="w-full flex items-center justify-between gap-4 p-6 text-left"
-              >
-                <span className={`font-semibold transition-colors ${openIndex === i ? "text-amber-600" : "text-slate-900"}`}>{faq.p}</span>
-                <ChevronDown size={20} className={`text-slate-400 shrink-0 transition-transform duration-300 ${openIndex === i ? "rotate-180" : ""}`} />
+        {/* ── SERVICIOS ─────────────────────────────────────────────────────── */}
+        <section id="servicios" style={{ padding:"96px 24px", background:"var(--cream)" }}>
+          <div style={{ maxWidth:1280, margin:"0 auto" }}>
+            {/* header */}
+            <div style={{ textAlign:"center", marginBottom:56 }}>
+              <p style={{ fontSize:11, fontWeight:700, letterSpacing:".25em", textTransform:"uppercase", color:"var(--amber)", marginBottom:12 }}>¿Qué puedes empeñar?</p>
+              <h2 style={{ fontSize:"clamp(2rem,4vw,3rem)", fontWeight:900, color:"var(--navy)", marginBottom:16 }}>Artículos que aceptamos</h2>
+              <p style={{ fontSize:"1.05rem", color:"var(--slate)", maxWidth:500, margin:"0 auto" }}>
+                Nos especializamos en electrónica, herramientas y equipos del hogar. No en joyas.
+              </p>
+            </div>
+
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(240px,1fr))", gap:20 }}>
+              {SERVICIOS.map(({ icon: Icon, label, desc }) => (
+                <article key={label} className="service-card" style={{ background:"#fff", border:"1.5px solid var(--cream-dark)", borderRadius:14, padding:28 }}>
+                  <div style={{ width:44, height:44, borderRadius:10, background:"color-mix(in srgb, var(--navy) 6%, transparent)", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:16 }}>
+                    <Icon size={20} color="var(--navy)"/>
+                  </div>
+                  <h3 style={{ fontFamily:"var(--font-display)", fontWeight:700, fontSize:"1.05rem", color:"var(--navy)", marginBottom:6 }}>{label}</h3>
+                  <p style={{ fontSize:13, color:"var(--slate)", lineHeight:1.6 }}>{desc}</p>
+                </article>
+              ))}
+            </div>
+
+            <p style={{ textAlign:"center", marginTop:36, fontSize:14, color:"var(--slate)" }}>
+              ¿No ves tu artículo?{" "}
+              <button onClick={() => scrollTo("#contacto")} style={{ background:"none", border:"none", cursor:"pointer", color:"var(--amber)", fontWeight:700, fontSize:14, textDecoration:"underline", fontFamily:"var(--font-body)" }}>
+                Consúltanos →
               </button>
-              <div className={`grid transition-all duration-300 ease-in-out ${openIndex === i ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
-                <div className="overflow-hidden">
-                  <p className="px-6 pb-6 text-sm text-slate-600 leading-relaxed">{faq.r}</p>
+            </p>
+          </div>
+        </section>
+
+        {/* ── PROCESO ───────────────────────────────────────────────────────── */}
+        <section id="proceso" style={{ padding:"96px 24px", background:"var(--navy)", position:"relative", overflow:"hidden" }}>
+          <div aria-hidden className="dot-bg" style={{ position:"absolute", inset:0, opacity:.07 }}/>
+          <div aria-hidden style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:600, height:600, borderRadius:"50%", background:"color-mix(in srgb, var(--amber) 5%, transparent)", filter:"blur(80px)", pointerEvents:"none" }}/>
+
+          <div style={{ maxWidth:1280, margin:"0 auto", position:"relative", zIndex:1 }}>
+            <div style={{ textAlign:"center", marginBottom:64 }}>
+              <p style={{ fontSize:11, fontWeight:700, letterSpacing:".25em", textTransform:"uppercase", color:"var(--amber)", marginBottom:12 }}>Proceso simple</p>
+              <h2 style={{ fontSize:"clamp(2rem,4vw,3rem)", fontWeight:900, color:"#fff", marginBottom:16 }}>Obtén tu dinero en 4 pasos</h2>
+              <p style={{ fontSize:"1.05rem", color:"rgba(255,255,255,.55)", maxWidth:480, margin:"0 auto" }}>
+                Sin papeleo, sin esperas. Todo explicado con total claridad.
+              </p>
+            </div>
+
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(220px,1fr))", gap:16 }}>
+              {PASOS.map((paso, i) => (
+                <div key={paso.n} style={{ background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.09)", borderRadius:14, padding:28, position:"relative", transition:"border-color .2s" }}
+                  onMouseEnter={e => ((e.currentTarget as HTMLDivElement).style.borderColor = "color-mix(in srgb, var(--amber) 50%, transparent)")}
+                  onMouseLeave={e => ((e.currentTarget as HTMLDivElement).style.borderColor = "rgba(255,255,255,.09)")}
+                >
+                  <div style={{ fontFamily:"var(--font-display)", fontWeight:900, fontSize:"3.5rem", color:"color-mix(in srgb, var(--amber) 20%, transparent)", lineHeight:1, marginBottom:16, userSelect:"none" }}>{paso.n}</div>
+                  <h3 style={{ fontFamily:"var(--font-display)", fontWeight:700, color:"#fff", fontSize:"1.1rem", marginBottom:10 }}>{paso.titulo}</h3>
+                  <p style={{ fontSize:13, color:"rgba(255,255,255,.5)", lineHeight:1.7 }}>{paso.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* guarantees */}
+            <div style={{ marginTop:48, display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(260px,1fr))", gap:16, maxWidth:700, marginLeft:"auto", marginRight:"auto" }}>
+              {[
+                { icon: Lock,        title: "Artículos asegurados",  desc: "Cada artículo queda registrado y guardado bajo llave durante el plazo del préstamo." },
+                { icon: TrendingUp,  title: "Precio de mercado",     desc: "Tasamos según el valor real actual para garantizarte la mejor oferta posible." },
+              ].map(({ icon: Icon, title, desc }) => (
+                <div key={title} style={{ display:"flex", gap:16, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.08)", borderRadius:12, padding:20 }}>
+                  <div style={{ width:40, height:40, borderRadius:10, background:"color-mix(in srgb, var(--amber) 18%, transparent)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    <Icon size={18} color="var(--amber)"/>
+                  </div>
+                  <div>
+                    <p style={{ fontWeight:600, color:"#fff", fontSize:14, marginBottom:4 }}>{title}</p>
+                    <p style={{ fontSize:12, color:"rgba(255,255,255,.45)", lineHeight:1.6 }}>{desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── NOSOTROS ──────────────────────────────────────────────────────── */}
+        <section id="nosotros" style={{ padding:"96px 24px", background:"#fff" }}>
+          <div style={{ maxWidth:1280, margin:"0 auto", display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(300px,1fr))", gap:64, alignItems:"center" }}>
+            {/* text */}
+            <div>
+              <p style={{ fontSize:11, fontWeight:700, letterSpacing:".25em", textTransform:"uppercase", color:"var(--amber)", marginBottom:12 }}>Quiénes somos</p>
+              <h2 style={{ fontSize:"clamp(2rem,4vw,2.8rem)", fontWeight:900, color:"var(--navy)", marginBottom:20 }}>
+                Más de 15 años<br/>
+                <span style={{ color:"var(--amber)" }}>al servicio</span> de Cochabamba
+              </h2>
+              <p style={{ color:"var(--slate)", lineHeight:1.8, marginBottom:16 }}>
+                Somos una empresa familiar con más de 15 años en el sector de empeño y compra-venta. Nuestra misión es ofrecer soluciones financieras rápidas con el respeto y discreción que cada cliente merece.
+              </p>
+              <p style={{ color:"var(--slate)", lineHeight:1.8, marginBottom:32 }}>
+                Cada artículo es evaluado con precisión y honestidad por nuestro equipo. Sin sorpresas, sin letra pequeña.
+              </p>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+                {[
+                  { icon: ShieldCheck, label: "Empresa regulada y registrada" },
+                  { icon: Clock,       label: "Atención Lun–Sáb 8am–7pm" },
+                  { icon: Star,        label: "Miles de clientes satisfechos" },
+                  { icon: Lock,        label: "Artículos asegurados bajo llave" },
+                ].map(({ icon: Icon, label }) => (
+                  <div key={label} style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    <Icon size={14} color="var(--amber)"/>
+                    <span style={{ fontSize:13, color:"var(--slate)" }}>{label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* testimonios */}
+            <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+              {TESTIMONIOS.map(t => (
+                <article key={t.nombre} style={{ background:"var(--cream)", border:"1.5px solid var(--cream-dark)", borderRadius:14, padding:20, transition:"border-color .2s" }}
+                  onMouseEnter={e => ((e.currentTarget as HTMLElement).style.borderColor = "color-mix(in srgb, var(--amber) 45%, transparent)")}
+                  onMouseLeave={e => ((e.currentTarget as HTMLElement).style.borderColor = "var(--cream-dark)")}
+                >
+                  <div style={{ display:"flex", gap:2, marginBottom:10 }}>
+                    {Array.from({ length: t.estrellas }).map((_, i) => (
+                      <Star key={i} size={13} color="var(--amber)" fill="var(--amber)"/>
+                    ))}
+                  </div>
+                  <p style={{ fontSize:13, color:"var(--slate)", lineHeight:1.7, marginBottom:12 }}>"{t.texto}"</p>
+                  <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                    <div style={{ width:32, height:32, borderRadius:"50%", background:"var(--navy)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                      <span style={{ fontFamily:"var(--font-display)", fontWeight:700, color:"#fff", fontSize:13 }}>{t.inicial}</span>
+                    </div>
+                    <div>
+                      <p style={{ fontWeight:600, fontSize:13, color:"var(--navy)" }}>{t.nombre}</p>
+                      <p style={{ fontSize:11, color:"var(--slate)" }}>{t.ciudad}</p>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── FAQ ───────────────────────────────────────────────────────────── */}
+        <section id="faq" style={{ padding:"96px 24px", background:"var(--cream)" }}>
+          <div style={{ maxWidth:1280, margin:"0 auto", display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(280px,1fr))", gap:64, alignItems:"start" }}>
+            {/* sticky left */}
+            <div style={{ position:"sticky", top:88 }}>
+              <p style={{ fontSize:11, fontWeight:700, letterSpacing:".25em", textTransform:"uppercase", color:"var(--amber)", marginBottom:12 }}>Preguntas frecuentes</p>
+              <h2 style={{ fontSize:"clamp(1.8rem,3.5vw,2.6rem)", fontWeight:900, color:"var(--navy)", marginBottom:16 }}>Todo lo que necesitas saber</h2>
+              <p style={{ color:"var(--slate)", lineHeight:1.8, marginBottom:28 }}>
+                Si no encuentras tu respuesta aquí, escríbenos directamente.
+              </p>
+              <button onClick={() => scrollTo("#contacto")}
+                style={{ display:"flex", alignItems:"center", gap:8, background:"var(--navy)", color:"#fff", fontWeight:600, fontSize:13, padding:"12px 20px", borderRadius:8, border:"none", cursor:"pointer", transition:"background .2s" }}
+                onMouseEnter={e => (e.currentTarget.style.background = "var(--navy-mid)")}
+                onMouseLeave={e => (e.currentTarget.style.background = "var(--navy)")}
+              >
+                Ir a contacto <ArrowRight size={14}/>
+              </button>
+            </div>
+
+            {/* accordion */}
+            <div style={{ background:"#fff", borderRadius:16, overflow:"hidden", border:"1.5px solid var(--cream-dark)" }}>
+              {FAQS.map((faq, i) => (
+                <div key={i} style={{ borderBottom: i < FAQS.length - 1 ? "1px solid var(--cream-dark)" : "none" }}>
+                  <button
+                    onClick={() => setFaqOpen(faqOpen === i ? null : i)}
+                    aria-expanded={faqOpen === i}
+                    style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, padding:"20px 24px", background:"none", border:"none", cursor:"pointer", textAlign:"left" }}
+                  >
+                    <span style={{ fontWeight:600, fontSize:14, color: faqOpen === i ? "var(--amber)" : "var(--navy)", transition:"color .2s" }}>{faq.p}</span>
+                    <div style={{ width:26, height:26, borderRadius:"50%", background:"var(--cream)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, transition:"transform .3s", transform: faqOpen === i ? "rotate(180deg)" : "rotate(0deg)" }}>
+                      <ChevronDown size={13} color="var(--slate)"/>
+                    </div>
+                  </button>
+                  <div className="faq-body" style={{ maxHeight: faqOpen === i ? 200 : 0, opacity: faqOpen === i ? 1 : 0 }}>
+                    <p style={{ padding:"0 24px 20px", fontSize:13, color:"var(--slate)", lineHeight:1.75 }}>{faq.r}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── CTA BAND ──────────────────────────────────────────────────────── */}
+        <section style={{ background:"var(--amber)", padding:"72px 24px", position:"relative", overflow:"hidden" }}>
+          <div aria-hidden style={{ position:"absolute", inset:0, backgroundImage:"repeating-linear-gradient(45deg,transparent,transparent 22px,rgba(0,0,0,.04) 22px,rgba(0,0,0,.04) 44px)" }}/>
+          <div style={{ maxWidth:1280, margin:"0 auto", display:"flex", flexWrap:"wrap", alignItems:"center", justifyContent:"space-between", gap:28, position:"relative", zIndex:1 }}>
+            <div>
+              <h2 style={{ fontFamily:"var(--font-display)", fontWeight:900, fontSize:"clamp(1.6rem,3.5vw,2.5rem)", color:"#fff", marginBottom:8 }}>¿Necesitas efectivo hoy?</h2>
+              <p style={{ color:"rgba(255,255,255,.8)", fontSize:"1rem" }}>Visítanos o escríbenos. En 15 minutos tienes el dinero en mano.</p>
+            </div>
+            <div style={{ display:"flex", flexWrap:"wrap", gap:12 }}>
+              <a href={`https://wa.me/${CONTACTO.whatsapp}`} target="_blank" rel="noreferrer"
+                style={{ display:"flex", alignItems:"center", gap:8, background:"var(--navy)", color:"#fff", fontWeight:700, padding:"14px 24px", borderRadius:8, textDecoration:"none", fontSize:14, transition:"background .2s" }}
+                onMouseEnter={e => (e.currentTarget.style.background = "var(--navy-mid)")}
+                onMouseLeave={e => (e.currentTarget.style.background = "var(--navy)")}
+              >
+                <MessageCircle size={16}/> WhatsApp <ArrowRight size={14}/>
+              </a>
+              <button onClick={() => scrollTo("#contacto")}
+                style={{ display:"flex", alignItems:"center", gap:8, background:"rgba(255,255,255,.2)", color:"#fff", fontWeight:600, padding:"14px 24px", borderRadius:8, border:"none", cursor:"pointer", fontSize:14, transition:"background .2s" }}
+                onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,.3)")}
+                onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,.2)")}
+              >
+                Ver dirección
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* ── CONTACTO ──────────────────────────────────────────────────────── */}
+        <section id="contacto" style={{ padding:"96px 24px", background:"#fff" }}>
+          <div style={{ maxWidth:1280, margin:"0 auto" }}>
+            <div style={{ textAlign:"center", marginBottom:56 }}>
+              <p style={{ fontSize:11, fontWeight:700, letterSpacing:".25em", textTransform:"uppercase", color:"var(--amber)", marginBottom:12 }}>Encuéntranos</p>
+              <h2 style={{ fontSize:"clamp(2rem,4vw,3rem)", fontWeight:900, color:"var(--navy)" }}>Estamos para ayudarte</h2>
+            </div>
+
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(300px,1fr))", gap:20 }}>
+              {/* WhatsApp card */}
+              <div style={{ background:"var(--navy)", borderRadius:16, padding:32, display:"flex", flexDirection:"column", gap:16 }}>
+                <div style={{ width:48, height:48, borderRadius:12, background:"color-mix(in srgb, var(--amber) 20%, transparent)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                  <MessageCircle size={24} color="var(--amber)"/>
+                </div>
+                <div>
+                  <h3 style={{ fontFamily:"var(--font-display)", fontWeight:700, color:"#fff", fontSize:"1.3rem", marginBottom:8 }}>Respuesta inmediata</h3>
+                  <p style={{ fontSize:13, color:"rgba(255,255,255,.55)", lineHeight:1.7 }}>
+                    Mándanos una foto de tu artículo por WhatsApp y te damos una valoración antes de que vengas. Sin compromiso.
+                  </p>
+                </div>
+                <a href={`https://wa.me/${CONTACTO.whatsapp}?text=Hola,%20quiero%20consultar%20sobre%20un%20empe%C3%B1o.`} target="_blank" rel="noreferrer"
+                  style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, background:"var(--amber)", color:"#fff", fontWeight:700, padding:"12px", borderRadius:8, textDecoration:"none", fontSize:14, marginTop:"auto", transition:"background .2s" }}
+                  onMouseEnter={e => (e.currentTarget.style.background = "var(--amber-hi)")}
+                  onMouseLeave={e => (e.currentTarget.style.background = "var(--amber)")}
+                >
+                  <MessageCircle size={15}/> Escribir ahora
+                </a>
+              </div>
+
+              {/* Info grid */}
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))", gap:16 }} className="info-grid">
+                {[
+                  { icon: MapPin, title: "Dirección",      lines: [CONTACTO.direccion, CONTACTO.ciudad] },
+                  { icon: Phone,  title: "Teléfono",        lines: [CONTACTO.telefono] },
+                  { icon: Mail,   title: "Email",           lines: [CONTACTO.email] },
+                ].map(({ icon: Icon, title, lines }) => (
+                  <div key={title} style={{ background:"var(--cream)", border:"1.5px solid var(--cream-dark)", borderRadius:12, padding:20 }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:12 }}>
+                      <Icon size={15} color="var(--amber)"/>
+                      <span style={{ fontWeight:600, fontSize:13, color:"var(--navy)" }}>{title}</span>
+                    </div>
+                    {lines.map(l => (
+                      <p key={l} style={{ fontSize:13, color:"var(--slate)", lineHeight:1.6 }}>{l}</p>
+                    ))}
+                  </div>
+                ))}
+
+                {/* Horarios */}
+                <div style={{ background:"var(--cream)", border:"1.5px solid var(--cream-dark)", borderRadius:12, padding:20 }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:12 }}>
+                    <Clock size={15} color="var(--amber)"/>
+                    <span style={{ fontWeight:600, fontSize:13, color:"var(--navy)" }}>Horarios</span>
+                  </div>
+                  {CONTACTO.horarios.map(h => (
+                    <div key={h.dia} style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
+                      <span style={{ fontSize:12, color:"var(--slate)" }}>{h.dia}</span>
+                      <span style={{ fontSize:12, fontWeight:600, color: h.hora === "Cerrado" ? "#ef4444" : "var(--navy)" }}>{h.hora}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Garantías */}
+                <div style={{ background:"var(--cream)", border:"1.5px solid var(--cream-dark)", borderRadius:12, padding:20 }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:12 }}>
+                    <ShieldCheck size={15} color="var(--amber)"/>
+                    <span style={{ fontWeight:600, fontSize:13, color:"var(--navy)" }}>Garantías</span>
+                  </div>
+                  {["Empresa registrada y regulada", "Proceso 100% transparente", "Total confidencialidad", "Artículos asegurados"].map(g => (
+                    <div key={g} style={{ display:"flex", alignItems:"center", gap:6, marginBottom:5 }}>
+                      <Check size={11} color="var(--amber)"/>
+                      <span style={{ fontSize:12, color:"var(--slate)" }}>{g}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
+          </div>
+        </section>
 
-const Footer = () => (
-  <footer className="bg-slate-950 border-t border-white/10 py-10 px-6">
-    <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 bg-amber-500 rounded-md flex items-center justify-center font-bold text-white text-xs">GC</div>
-        <span className="font-bold text-white text-lg">Empeños GC</span>
-      </div>
-      <p className="text-sm text-white/40 text-center">© {new Date().getFullYear()} Empeños GC · Cochabamba, Bolivia. Todos los derechos reservados.</p>
-      <p className="text-sm text-white/40 text-center">Empresa regulada · Proceso transparente</p>
-    </div>
-  </footer>
-)
-
-// ─── MAIN PAGE COMPONENT ─────────────────────────────────────────────────────
-
-export default function Page() {
-  return (
-    <div className="font-sans text-slate-900 bg-slate-50 selection:bg-amber-500/30">
-      <Navbar />
-      <main>
-        <Hero />
-        <Stats />
-        <Servicios />
-        <Proceso />
-        <FAQ />
       </main>
-      <Footer />
 
-      {/* Floating WhatsApp Button */}
-      <a 
-        href={`https://wa.me/${CONTACTO.whatsapp}?text=Hola,%20quiero%20consultar%20sobre%20un%20empe%C3%B1o.`}
-        target="_blank" 
-        rel="noreferrer"
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-bold py-3 px-5 rounded-full shadow-2xl hover:scale-105 transition-all duration-300"
+      {/* ── FOOTER ────────────────────────────────────────────────────────────── */}
+      <footer style={{ background:"var(--navy)", borderTop:"1px solid rgba(255,255,255,.07)" }}>
+        <div style={{ maxWidth:1280, margin:"0 auto", padding:"40px 24px", display:"flex", flexWrap:"wrap", alignItems:"center", justifyContent:"space-between", gap:16 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+            <div style={{ width:30, height:30, background:"var(--amber)", borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"var(--font-display)", fontWeight:900, color:"#fff", fontSize:12 }}>GC</div>
+            <span style={{ fontFamily:"var(--font-display)", fontWeight:700, color:"#fff", fontSize:16 }}>Empeños GC</span>
+          </div>
+          <p style={{ fontSize:12, color:"rgba(255,255,255,.3)" }}>© {new Date().getFullYear()} Empeños GC · Cochabamba, Bolivia. Todos los derechos reservados.</p>
+          <p style={{ fontSize:12, color:"rgba(255,255,255,.3)" }}>Empresa regulada · Proceso transparente</p>
+        </div>
+      </footer>
+
+      {/* ── FLOATING WHATSAPP ─────────────────────────────────────────────────── */}
+      <a href={`https://wa.me/${CONTACTO.whatsapp}?text=Hola,%20quiero%20consultar%20sobre%20un%20empe%C3%B1o.`}
+        target="_blank" rel="noreferrer"
+        aria-label="Contactar por WhatsApp"
+        style={{
+          position:"fixed", bottom:24, right:24, zIndex:50,
+          display:"flex", alignItems:"center", gap:8,
+          background:"#25D366", color:"#fff",
+          fontWeight:700, fontSize:13,
+          padding:"12px 18px", borderRadius:99,
+          textDecoration:"none", boxShadow:"0 8px 28px rgba(0,0,0,.25)",
+          transition:"background .2s, transform .2s",
+        }}
+        onMouseEnter={e => { e.currentTarget.style.background="#1ebe5d"; e.currentTarget.style.transform="scale(1.04)" }}
+        onMouseLeave={e => { e.currentTarget.style.background="#25D366"; e.currentTarget.style.transform="scale(1)" }}
       >
-        <MessageCircle size={20} />
-        <span className="hidden sm:inline">¿Tienes dudas?</span>
+        <MessageCircle size={18}/>
+        <span>¿Tienes dudas?</span>
       </a>
-    </div>
+
+      {/* ── RESPONSIVE OVERRIDES ──────────────────────────────────────────────── */}
+      <style>{`
+        @media (max-width: 768px) {
+          .hidden-mobile { display: none !important; }
+          .burger-btn    { display: flex !important; }
+          .info-grid     { grid-template-columns: 1fr 1fr !important; }
+        }
+        @media (max-width: 480px) {
+          .info-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
+    </>
   )
 }
