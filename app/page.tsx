@@ -7,6 +7,7 @@ import {
   Phone, MapPin, Mail, Menu, X, ChevronDown, ArrowRight,
   MessageCircle, Check, Target, Zap,
 } from "lucide-react"
+import ChatPage from "./chatbot/Bot"
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
@@ -547,23 +548,8 @@ export default function Page() {
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px,1fr))", gap: 20 }}>
               {/* WhatsApp card */}
-              <div style={{ background: "var(--navy)", borderRadius: 16, padding: 32, display: "flex", flexDirection: "column", gap: 16 }}>
-                <div style={{ width: 48, height: 48, borderRadius: 12, background: "color-mix(in srgb, var(--amber) 20%, transparent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <MessageCircle size={24} color="var(--amber)" />
-                </div>
-                <div>
-                  <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 700, color: "#fff", fontSize: "1.3rem", marginBottom: 8 }}>Respuesta inmediata</h3>
-                  <p style={{ fontSize: 13, color: "rgba(255,255,255,.55)", lineHeight: 1.7 }}>
-                    Mándanos una foto de tu artículo por WhatsApp y te damos una valoración antes de que vengas. Sin compromiso.
-                  </p>
-                </div>
-                <a href={`https://wa.me/${CONTACTO.whatsapp}?text=Hola,%20quiero%20consultar%20sobre%20un%20empe%C3%B1o.`} target="_blank" rel="noreferrer"
-                  style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "var(--amber)", color: "#fff", fontWeight: 700, padding: "12px", borderRadius: 8, textDecoration: "none", fontSize: 14, marginTop: "auto", transition: "background .2s" }}
-                  onMouseEnter={e => (e.currentTarget.style.background = "var(--amber-hi)")}
-                  onMouseLeave={e => (e.currentTarget.style.background = "var(--amber)")}
-                >
-                  <MessageCircle size={15} /> Escribir ahora
-                </a>
+              <div style={{ borderRadius: 16, display: "flex", flexDirection: "column", gap: 16 }}>
+                <ChatPage />
               </div>
 
               {/* Info grid */}
