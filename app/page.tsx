@@ -420,7 +420,7 @@ export default function Page() {
                   <Zap size={24} style={{ color: "var(--amber)", marginTop: "4px" }} />
                   <div>
                     <h4 style={{ fontWeight: 700, color: "var(--navy)", marginBottom: "4px" }}>Compromiso</h4>
-                    <p style={{ fontSize: "14px", color: "var(--slate)" }}>Tasar en 5 minutos y entregarte tu dinero al instante.</p>
+                    <p style={{ fontSize: "14px", color: "var(--slate)" }}>Tasar en 15 minutos y entregarte tu dinero al instante.</p>
                   </div>
                 </div>
               </div>
@@ -472,7 +472,7 @@ export default function Page() {
         <section id="faq" style={{ padding: "96px 24px", background: "var(--cream)" }}>
           <div style={{ maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px,1fr))", gap: 64, alignItems: "start" }}>
             {/* sticky left */}
-            <div style={{ position: "sticky", top: 88 }}>
+            <div>
               <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".25em", textTransform: "uppercase", color: "var(--amber)", marginBottom: 12 }}>Preguntas frecuentes</p>
               <h2 style={{ fontSize: "clamp(1.8rem,3.5vw,2.6rem)", fontWeight: 900, color: "var(--navy)", marginBottom: 16 }}>Todo lo que necesitas saber</h2>
               <p style={{ color: "var(--slate)", lineHeight: 1.8, marginBottom: 28 }}>
@@ -570,7 +570,6 @@ export default function Page() {
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 16 }} className="info-grid">
                 {[
                   { icon: MapPin, title: "Dirección", lines: [CONTACTO.direccion, CONTACTO.ciudad] },
-                  { icon: Phone, title: "Teléfono", lines: [CONTACTO.telefono] },
                   { icon: Mail, title: "Email", lines: [CONTACTO.email] },
                 ].map(({ icon: Icon, title, lines }) => (
                   <div key={title} style={{ background: "var(--cream)", border: "1.5px solid var(--cream-dark)", borderRadius: 12, padding: 20 }}>
@@ -604,7 +603,7 @@ export default function Page() {
                     <ShieldCheck size={15} color="var(--amber)" />
                     <span style={{ fontWeight: 600, fontSize: 13, color: "var(--navy)" }}>Garantías</span>
                   </div>
-                  {["Empresa registrada y regulada", "Proceso 100% transparente", "Total confidencialidad", "Artículos asegurados"].map(g => (
+                  {["Empresa registrada", "Proceso 100% transparente", "Total confidencialidad", "Artículos asegurados"].map(g => (
                     <div key={g} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}>
                       <Check size={11} color="var(--amber)" />
                       <span style={{ fontSize: 12, color: "var(--slate)" }}>{g}</span>
@@ -622,11 +621,11 @@ export default function Page() {
       <footer style={{ background: "var(--navy)", borderTop: "1px solid rgba(255,255,255,.07)" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "40px 24px", display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 30, height: 30, background: "var(--amber)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-display)", fontWeight: 900, color: "#fff", fontSize: 12 }}>GC</div>
-            <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, color: "#fff", fontSize: 16 }}>Empeños GC</span>
+            <div style={{ width: 30, height: 30, background: "var(--amber)", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-display)", fontWeight: 900, color: "#fff", fontSize: 12 }}>G&C</div>
+            <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, color: "#fff", fontSize: 16 }}>Empeños G&C</span>
           </div>
-          <p style={{ fontSize: 12, color: "rgba(255,255,255,.3)" }}>© {new Date().getFullYear()} Empeños GC · Cochabamba, Bolivia. Todos los derechos reservados.</p>
-          <p style={{ fontSize: 12, color: "rgba(255,255,255,.3)" }}>Empresa regulada · Proceso transparente</p>
+          <p style={{ fontSize: 12, color: "rgba(255,255,255,.3)" }}>© {new Date().getFullYear()} Empeños G&C · Sacaba, Cochabamba. Todos los derechos reservados.</p>
+          <p style={{ fontSize: 12, color: "rgba(255,255,255,.3)" }}>Empresa registrada · Proceso transparente</p>
         </div>
       </footer>
 
@@ -647,7 +646,7 @@ export default function Page() {
         onMouseLeave={e => { e.currentTarget.style.background = "#25D366"; e.currentTarget.style.transform = "scale(1)" }}
       >
         <MessageCircle size={18} />
-        <span>¿Tienes dudas?</span>
+        <span>Contáctanos</span>
       </a>
 
       {/* ── RESPONSIVE OVERRIDES ──────────────────────────────────────────────── */}
