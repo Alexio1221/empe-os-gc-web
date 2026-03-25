@@ -22,7 +22,7 @@ export default function ChatPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    // ✅ Fix hydration: string vacío en servidor, generado en useEffect (solo cliente)
+    // Fix hydration: string vacío en servidor, generado en useEffect (solo cliente)
     const [captchaCode, setCaptchaCode] = useState("");
     const [captchaInput, setCaptchaInput] = useState("");
     const [captchaError, setCaptchaError] = useState(false);
@@ -121,9 +121,26 @@ export default function ChatPage() {
         refreshCaptcha();
 
         try {
-            const body: any = { prompt: currentPrompt };
+            // 🧠 Convertir historial
+            const history = messages.map((msg) => ({
+                role: msg.role === "assistant" ? "model" : "user",
+                parts: [{ text: msg.text }],
+            }));
+
+            // ⚠️ Limitar historial (MUY IMPORTANTE)
+            const limitedHistory = history.slice(-6); // 👈 aquí tu idea
+
+            const body: any = {
+                message: currentPrompt,
+                history: limitedHistory,
+            };
+
+            console.log(body)
             if (currentImageBase64) {
-                body.image = { data: currentImageBase64, mimeType: currentMimeType };
+                body.image = {
+                    data: currentImageBase64,
+                    mimeType: currentMimeType,
+                };
             }
 
             const res = await fetch("/api/chat", {
@@ -135,18 +152,37 @@ export default function ChatPage() {
             if (!res.ok) {
                 const text = await res.text();
                 console.error("Error del servidor:", text);
-                setError("Hubo un error al obtener la respuesta.");
+
+                // 💡 mejora UX
+                setMessages((prev) => [
+                    ...prev,
+                    {
+                        role: "assistant",
+                        text: "⚠️ El servicio está ocupado, intenta en unos segundos.",
+                    },
+                ]);
+
                 return;
             }
 
             const data = await res.json();
+
             setMessages((prev) => [
                 ...prev,
                 { role: "assistant", text: data.text },
             ]);
+
         } catch (err) {
             console.error("Error de red:", err);
-            setError("Error de conexión. Intenta de nuevo.");
+
+            setMessages((prev) => [
+                ...prev,
+                {
+                    role: "assistant",
+                    text: "⚠️ Error de conexión. Intenta nuevamente.",
+                },
+            ]);
+
         } finally {
             setLoading(false);
         }
