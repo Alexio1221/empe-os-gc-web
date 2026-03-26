@@ -58,7 +58,7 @@ const CONTACTO = {
   direccion: "Calle Beneméritos de la Patria, entre Av. Villazón y Calle Colombia",
   ciudad: "Cochabamba-Sacaba, Bolivia",
   horarios: [
-    { dia: "Lunes - Viernes", hora: "8:00 – 20:00" },
+    { dia: "Lunes - Viernes", hora: "9:00 – 19:00" },
     { dia: "Sábado - Domingo", hora: "10:00 – 17:00" },
   ],
 }

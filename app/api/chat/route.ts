@@ -33,7 +33,7 @@ export async function POST(req: Request) {
 
     for (const modelName of models) {
       try {
-        console.log("Intentando modelo:", modelName);
+        //console.log("Intentando modelo:", modelName);
 
         const model = genAI.getGenerativeModel({
           model: modelName,
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
 
         let result;
         const fullPrompt = `${historyText} Usuario: ${message} IA:`;
-        console.log(fullPrompt)
+        //console.log(fullPrompt)
         if (image) {
           const { data, mimeType } = image;
 
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
 
         const response = await result.response;
 
-        console.log("Funcionó con:", modelName);
+        //console.log("Funcionó con:", modelName);
 
         return Response.json({
           text: response.text(),
