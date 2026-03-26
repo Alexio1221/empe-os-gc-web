@@ -59,8 +59,7 @@ const CONTACTO = {
   ciudad: "Cochabamba-Sacaba, Bolivia",
   horarios: [
     { dia: "Lunes - Viernes", hora: "8:00 – 20:00" },
-    { dia: "Sábado", hora: "10:00 – 17:00" },
-    { dia: "Domingo", hora: "Cerrado" },
+    { dia: "Sábado - Domingo", hora: "10:00 – 17:00" },
   ],
 }
 
