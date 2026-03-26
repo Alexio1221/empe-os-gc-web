@@ -1,7 +1,9 @@
 "use client";
 
+import Lottie from "lottie-react";
 import { useState, useRef, useEffect, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
+import botAnimation from "@/app/animaciones/botAnimation.json"
 
 function generateCaptcha(length = 5): string {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -121,21 +123,20 @@ export default function ChatPage() {
         refreshCaptcha();
 
         try {
-            // 🧠 Convertir historial
+            // Convertir historial
             const history = messages.map((msg) => ({
                 role: msg.role === "assistant" ? "model" : "user",
                 parts: [{ text: msg.text }],
             }));
 
-            // ⚠️ Limitar historial (MUY IMPORTANTE)
-            const limitedHistory = history.slice(-6); // 👈 aquí tu idea
+            // Limitar historial 
+            const limitedHistory = history.slice(-6);
 
             const body: any = {
                 message: currentPrompt,
                 history: limitedHistory,
             };
 
-            console.log(body)
             if (currentImageBase64) {
                 body.image = {
                     data: currentImageBase64,
@@ -200,13 +201,17 @@ export default function ChatPage() {
             <div style={styles.container}>
                 <div style={styles.header}>
                     <div style={styles.headerDot} />
-                    <span style={styles.headerTitle}>Asistente IA</span>
+                    <span style={styles.headerTitle}>Asistente Empeños G&C</span>
                 </div>
 
                 <div ref={messagesContainerRef} style={styles.messagesArea}>
                     {messages.length === 0 && (
                         <div style={styles.emptyState}>
-                            <span style={styles.emptyIcon}>✦</span>
+                            <Lottie
+                                animationData={botAnimation}
+                                loop
+                                style={{ width: 150 }}
+                            />
                             <p style={styles.emptyText}>¿En qué puedo ayudarte hoy?</p>
                         </div>
                     )}
@@ -264,7 +269,7 @@ export default function ChatPage() {
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="Escribe tu mensaje... (Enter para enviar)"
+                        placeholder="Escribe tu mensaje..."
                         style={styles.textarea}
                         rows={2}
                         disabled={loading}
@@ -329,6 +334,9 @@ export default function ChatPage() {
                         </button>
                     </div>
                 </div>
+                <div style={styles.footerDisclaimer}>
+                    El asistente de Empeños G&C es una IA y puede cometer errores.
+                </div>
             </div>
             {modal.open && (
                 <div style={styles.modalOverlay}>
@@ -368,29 +376,32 @@ const styles: Record<string, React.CSSProperties> = {
     container: {
         width: "100%",
         maxWidth: 720,
-        background: "#161616",
-        border: "1px solid #2a2a2a",
+        background: "#0f172a",
+        border: "1px solid #1e293b",
         borderRadius: 16,
         display: "flex",
         flexDirection: "column",
         height: "88vh",
         overflow: "hidden",
     },
+
     header: {
         padding: "16px 24px",
-        borderBottom: "1px solid #222",
+        borderBottom: "1px solid #1e293b",
+        background: "#020617",
         display: "flex",
         alignItems: "center",
         gap: 10,
     },
-    headerDot: { width: 8, height: 8, borderRadius: "50%", background: "#c9a84c" },
+
+    headerDot: { width: 8, height: 8, borderRadius: "50%", background: "#38bdf8" },
+
     headerTitle: {
-        color: "#e0e0e0",
+        color: "#e2e8f0",
         fontSize: 15,
         fontWeight: 600,
-        letterSpacing: "0.05em",
-        textTransform: "uppercase",
     },
+
     messagesArea: {
         flex: 1,
         overflowY: "auto",
@@ -398,96 +409,215 @@ const styles: Record<string, React.CSSProperties> = {
         display: "flex",
         flexDirection: "column",
         gap: 14,
+        background: "#0f172a",
     },
-    emptyState: { margin: "auto", textAlign: "center", opacity: 0.3 },
-    emptyIcon: { fontSize: 32, color: "#c9a84c", display: "block", marginBottom: 10 },
-    emptyText: { color: "#999", fontSize: 14, fontFamily: "'DM Mono', monospace" },
+
+    emptyState: {
+        flex: 1, // ocupa todo el espacio disponible
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center", // centra vertical
+        alignItems: "center",     // centra horizontal
+        textAlign: "center",
+        gap: 12
+    },
+    emptyText: { color: "#94a3b8", fontSize: 14 },
+
     bubble: {
-        maxWidth: "80%",
+        maxWidth: "85%",
         padding: "12px 16px",
-        borderRadius: 12,
+        borderRadius: 14,
         display: "flex",
         flexDirection: "column",
         gap: 6,
     },
-    bubbleUser: { alignSelf: "flex-end", background: "#1e1a10", border: "1px solid #3d3010" },
-    bubbleAssistant: { alignSelf: "flex-start", background: "#1a1a1a", border: "1px solid #2a2a2a" },
-    bubbleRole: {
-        fontSize: 11,
-        fontFamily: "'DM Mono', monospace",
-        color: "#c9a84c",
-        fontWeight: 500,
-        textTransform: "uppercase",
-        letterSpacing: "0.08em",
+
+    bubbleUser: {
+        alignSelf: "flex-end",
+        background: "#2563eb",
+        color: "#ffffff",
+        borderRadius: "14px 14px 4px 14px",
     },
+
+    bubbleAssistant: {
+        alignSelf: "flex-start",
+        background: "#1e293b",
+        color: "#ffffff",
+        border: "1px solid #334155",
+        borderRadius: "14px 14px 14px 4px",
+    },
+
+    bubbleRole: {
+        fontSize: 10,
+        color: "#38bdf8",
+        fontWeight: 700,
+        textTransform: "uppercase",
+    },
+
     bubbleText: {
-        color: "#d4d4d4",
         fontSize: 14,
         lineHeight: 1.6,
     },
-    bubbleImage: { maxWidth: "100%", maxHeight: 180, borderRadius: 8, objectFit: "cover", border: "1px solid #333" },
+
+    bubbleImage: {
+        maxWidth: "100%",
+        maxHeight: 200,
+        borderRadius: 10,
+        objectFit: "cover",
+        marginTop: 4
+    },
+
     loadingDots: { display: "flex", gap: 5, alignItems: "center" },
-    dot: { width: 7, height: 7, borderRadius: "50%", background: "#c9a84c", display: "inline-block" },
-    errorText: { color: "#e05555", fontSize: 13, textAlign: "center", padding: "8px 0", fontFamily: "'DM Mono', monospace" },
-    imagePreviewContainer: { margin: "0 24px 8px", display: "inline-flex", alignItems: "flex-start", gap: 6, width: "fit-content" },
-    imagePreviewThumb: { width: 60, height: 60, objectFit: "cover", borderRadius: 8, border: "1px solid #3a3a3a" },
-    removeImageBtn: { background: "#333", border: "none", color: "#ccc", width: 20, height: 20, borderRadius: "50%", fontSize: 10, display: "flex", alignItems: "center", justifyContent: "center" },
-    inputArea: { borderTop: "1px solid #222", padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10 },
+    dot: { width: 7, height: 7, borderRadius: "50%", background: "#38bdf8" },
+
+    errorText: { color: "#f87171", fontSize: 13, textAlign: "center" },
+
+    imagePreviewContainer: {
+        margin: "0 24px 8px",
+        display: "inline-flex",
+        gap: 6,
+        background: "#020617",
+        padding: 6,
+        borderRadius: 10,
+        border: "1px solid #1e293b",
+    },
+
+    imagePreviewThumb: {
+        width: 64,
+        height: 64,
+        objectFit: "cover",
+        borderRadius: 8
+    },
+
+    removeImageBtn: {
+        background: "#ef4444",
+        border: "none",
+        color: "white",
+        width: 22,
+        height: 22,
+        borderRadius: "50%",
+        cursor: "pointer",
+    },
+
+    inputArea: {
+        borderTop: "1px solid #1e293b",
+        padding: "16px",
+        background: "#020617",
+        display: "flex",
+        flexDirection: "column",
+        gap: 12,
+    },
+
     textarea: {
         width: "100%",
-        background: "#1a1a1a",
-        border: "1px solid #2a2a2a",
-        borderRadius: 10,
-        color: "#e0e0e0",
-        padding: "10px 14px",
+        background: "#111827",
+        border: "2px solid #ffffff",
+        borderRadius: 12,
+        color: "#ffffff",
+        padding: "14px 16px",
         fontSize: 14,
         resize: "none",
-        fontFamily: "'Syne', sans-serif",
         lineHeight: 1.5,
-        transition: "border-color 0.2s",
     },
-    inputRow: { display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" },
-    attachBtn: { background: "#1e1e1e", border: "1px solid #2e2e2e", borderRadius: 8, padding: "8px 10px", fontSize: 16, color: "#aaa", flexShrink: 0 },
-    captchaGroup: { display: "flex", alignItems: "center", gap: 8, flex: 1, flexWrap: "wrap" },
-    captchaBox: { background: "#111", border: "1px solid #333", borderRadius: 8, padding: "6px 12px", display: "flex", alignItems: "center", gap: 6 },
-    captchaText: { fontFamily: "'DM Mono', monospace", fontSize: 16, fontWeight: 500, letterSpacing: "0.35em", color: "#c9a84c", userSelect: "none" },
-    refreshBtn: { background: "transparent", border: "none", color: "#666", fontSize: 16, padding: "0 2px", lineHeight: 1 },
-    captchaInput: {
-        background: "#1a1a1a",
-        border: "1px solid #2a2a2a",
-        borderRadius: 8,
-        color: "#e0e0e0",
-        padding: "7px 12px",
-        fontSize: 14,
-        width: 90,
-        fontFamily: "'DM Mono', monospace",
-        letterSpacing: "0.2em",
-        textTransform: "uppercase",
-        transition: "border-color 0.2s",
+
+    inputRow: {
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        flexWrap: "wrap"
     },
-    captchaInputError: { borderColor: "#8b2020", background: "#1a0e0e" },
-    captchaErrorMsg: { color: "#e05555", fontSize: 11, fontFamily: "'DM Mono', monospace" },
-    sendBtn: {
-        background: "#c9a84c",
-        border: "none",
+
+    attachBtn: {
+        background: "#111827",
+        border: "1px solid #334155",
+        borderRadius: 10,
+        padding: "10px",
+        fontSize: 18,
+        color: "#38bdf8",
+        cursor: "pointer",
+    },
+
+    captchaGroup: { display: "flex", alignItems: "center", gap: 8, flex: 1 },
+
+    captchaBox: {
+        background: "#111827",
+        border: "1px solid #334155",
         borderRadius: 8,
-        color: "#0e0e0e",
-        padding: "9px 18px",
-        fontSize: 13,
+        padding: "8px 12px",
+        display: "flex",
+        gap: 8,
+    },
+
+    captchaText: {
+        fontFamily: "monospace",
+        fontSize: 18,
         fontWeight: 700,
-        fontFamily: "'Syne', sans-serif",
-        letterSpacing: "0.03em",
-        flexShrink: 0,
-        marginLeft: "auto",
+        letterSpacing: "0.2em",
+        color: "#38bdf8"
     },
-    sendBtnDisabled: { background: "#2a2a2a", color: "#555" },
+
+    refreshBtn: {
+        background: "transparent",
+        border: "none",
+        color: "#38bdf8",
+        fontSize: 18,
+        cursor: "pointer"
+    },
+
+    captchaInput: {
+        background: "#111827",
+        border: "2px solid #334155",
+        borderRadius: 8,
+        color: "#f1f5f9",
+        padding: "8px",
+        width: 100,
+        textAlign: "center",
+        fontWeight: "bold",
+    },
+
+    captchaInputError: {
+        borderColor: "#ef4444",
+        background: "#2a1a1a"
+    },
+
+    captchaErrorMsg: {
+        color: "#ef4444",
+        fontSize: 11,
+        fontWeight: "bold"
+    },
+
+    sendBtn: {
+        background: "#38bdf8",
+        border: "none",
+        borderRadius: 20,
+        color: "#020617",
+        padding: "10px 22px",
+        fontSize: 14,
+        fontWeight: 700,
+        cursor: "pointer",
+        marginLeft: "auto",
+        boxShadow: "0 4px 10px rgba(56,189,248,0.3)",
+    },
+
+    sendBtnDisabled: {
+        background: "#334155",
+        color: "#94a3b8",
+        boxShadow: "none"
+    },
+
+    footerDisclaimer: {
+        fontSize: 11,
+        color: "#64748b",
+        textAlign: "center",
+        padding: "8px 16px",
+        borderTop: "1px solid #1e293b",
+        background: "#020617",
+    },
+
     modalOverlay: {
         position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        background: "rgba(0,0,0,0.6)",
+        top: 0, left: 0, width: "100%", height: "100%",
+        background: "rgba(0,0,0,0.7)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -495,26 +625,26 @@ const styles: Record<string, React.CSSProperties> = {
     },
 
     modal: {
-        background: "#1a1a1a",
-        border: "1px solid #2a2a2a",
-        borderRadius: 12,
-        padding: "20px 24px",
-        maxWidth: 300,
+        background: "#1e293b",
+        borderRadius: 16,
+        padding: "24px",
+        maxWidth: 320,
         textAlign: "center",
     },
 
     modalText: {
-        color: "#e0e0e0",
-        fontSize: 14,
-        marginBottom: 16,
+        color: "#e2e8f0",
+        fontSize: 15,
+        marginBottom: 20,
     },
 
     modalButton: {
-        background: "#c9a84c",
+        background: "#38bdf8",
         border: "none",
-        borderRadius: 8,
-        padding: "8px 16px",
-        color: "#0e0e0e",
+        borderRadius: 10,
+        padding: "10px 20px",
+        color: "#020617",
         fontWeight: 600,
+        cursor: "pointer",
     },
 };

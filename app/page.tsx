@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import {
   Laptop, Wrench, Tv, Smartphone, Gamepad2, WashingMachine,
   Camera, Music, ShieldCheck, Clock, TrendingUp, Lock,
-  Phone, MapPin, Mail, Menu, X, ChevronDown, ArrowRight,
+  MapPin, Mail, Menu, X, ChevronDown, ArrowRight,
   MessageCircle, Check, Target, Zap,
 } from "lucide-react"
 import ChatPage from "./chatbot/Bot"
@@ -444,7 +444,7 @@ export default function Page() {
               }}>
                 {/* La Imagen del Logo */}
                 <img
-                  src="/imagenes/logoGrande.webp" 
+                  src="/imagenes/logoGrande.webp"
                   alt="Logo Grande Empeños G&C - Transparencia y Honestidad"
                   style={{
                     width: "100%", // El logo no debe tocar los bordes del círculo
